@@ -1,3 +1,5 @@
 *.zip
 *.pptx
 *.pdf
+__pycache__/
+*.pyc
