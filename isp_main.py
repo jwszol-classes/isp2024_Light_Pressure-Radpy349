@@ -1,48 +1,36 @@
-import os, sys, io
-import M5
-from M5 import *
-from hardware import *
-from unit import DLightUnit
-from unit import ENVUnit
+from m5stack import *
+from m5stack_ui import *
+from uiflow import *
+from m5ui import M5ChartGraph, M5BarGraph
+from IoTcloud.AWS import AWS
+from libs.json_py import *
 import time
+import unit
+
+
+screen = M5Screen()
+screen.clean_screen()
+screen.set_screen_bg_color(0xFFFFFF)
+dlight_0 = unit.get(unit.DLIGHT, (14,13))
+bpsv11_0 = unit.get(unit.BPS_QMP, unit.PORTA)
+
+
+test = None
 
 
 
-i2c0 = None
-i2c1 = None
-env3_0 = None
-dlight_0 = None
+graph0 = M5ChartGraph(45, 0, 200, 100, 40, 0, 300, M5ChartGraph.LINE, 0xFFFFFF, 0x0288FB, 0.5, 5)
+graph1 = M5ChartGraph(45, 120, 200, 100, 40, 900, 1100, M5ChartGraph.LINE, 0xFFFFFF, 0x0288FB, 0.5, 5)
 
 
-def setup():
-  global i2c0, i2c1, env3_0, dlight_0
-
-  M5.begin()
-  Widgets.fillScreen(0x222222)
-
-  i2c0 = I2C(0, scl=Pin(36), sda=Pin(26), freq=100000)
-  i2c1 = I2C(1, scl=Pin(13), sda=Pin(14), freq=100000)
-  dlight_0 = DLightUnit(i2c0)
-  env3_0 = ENVUnit(i2c=i2c1, type=3)
-  dlight_0.configure(dlight_0.CONTINUOUSLY, dlight_0.H_RESOLUTION_MODE)
 
 
-def loop():
-  global i2c0, i2c1, env3_0, dlight_0
-  M5.update()
-  print(str((env3_0.read_pressure())))
-  print(str((dlight_0.get_lux())))
-  time.sleep(1)
-
-
-if name == 'main':
-  try:
-    setup()
-    while True:
-      loop()
-  except (Exception, KeyboardInterrupt) as e:
-    try:
-      from utility import print_error_msg
-      print_error_msg(e)
-    except ImportError:
-        print("please update to latest firmware")
+rtc.settime('ntp', host='us.pool.ntp.org', tzone=2)
+aws = AWS(things_name='M5stack_sobota', host='a2pvn903w589z0-ats.iot.us-east-1.amazonaws.com', port=8883, keepalive=60, cert_file_path="/flash/res/sobotacertificate.pem.crt", private_key_path="/flash/res/sobotaprivate.pem.key")
+aws.start()
+while True:
+  graph0.addSample(dlight_0.get_lux())
+  graph1.addSample(bpsv11_0.pressure)
+  aws.publish(str('core2'),str((py_2_json({'light':(dlight_0.get_lux()),'pressure':(bpsv11_0.pressure),'temp':(bpsv11_0.temperature),'timestamp':(rtc.datetime())}))))
+  wait(4)
+  wait_ms(2)
