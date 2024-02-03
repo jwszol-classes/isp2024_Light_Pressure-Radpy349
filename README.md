@@ -1,4 +1,4 @@
-﻿![](Aspose.Words.a68ce519-d855-491a-83fc-5a77017bcce4.001.png)
+﻿![](images/Aspose.Words.a68ce519-d855-491a-83fc-5a77017bcce4.001.png)
 
 **Ale na szczęście znaleźliśmy pewne obejście korzystając z EC2** ☺![](Aspose.Words.a68ce519-d855-491a-83fc-5a77017bcce4.002.jpeg)
 
