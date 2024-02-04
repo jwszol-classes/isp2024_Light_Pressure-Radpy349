@@ -59,7 +59,7 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     content = payload
     wiadomosc = str(payload)
     splited = wiadomosc.split(',')
-    filename = f"core2/day:{splited[5]}/hour:{splited[6]}/{splited[7]}:{splited[8]}.json"
+    filename = f"core2/day:{splited[4]}/hour:{splited[6]}/{splited[7]}:{splited[8]}.json"
     
     s3.Object('iotstorage180281', filename).put(Body=content)
 
